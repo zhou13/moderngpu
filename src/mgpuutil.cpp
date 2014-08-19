@@ -160,11 +160,17 @@ uint64 Rand(uint64 min, uint64 max) {
 }
 float Rand(float min, float max) {
 	MGPU_RAND_NS::uniform_real<float> r(min, max);
-	return r(mt19937);
+        MGPU_RAND_NS::variate_generator<
+            MGPU_RAND_NS::mt19937,
+            MGPU_RAND_NS::uniform_real<float> > g(mt19937, r);
+	return g();
 }
 double Rand(double min, double max) {
 	MGPU_RAND_NS::uniform_real<double> r(min, max);
-	return r(mt19937);
+        MGPU_RAND_NS::variate_generator<
+            MGPU_RAND_NS::mt19937,
+            MGPU_RAND_NS::uniform_real<double> > g(mt19937, r);
+	return g();
 }
 
 } // namespace mgpu
