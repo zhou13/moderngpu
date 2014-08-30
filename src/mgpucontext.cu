@@ -1,6 +1,6 @@
 /******************************************************************************
  * Copyright (c) 2013, NVIDIA CORPORATION.  All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *     * Redistributions of source code must retain the above copyright
@@ -119,7 +119,8 @@ struct DeviceGroup {
 				delete cudaDevices[i];
 			delete [] cudaDevices;
 		}
-		cudaDeviceReset();
+		// cudaDeviceReset();
+                // Make cuda-memcheck clean
 	}
 };
 
@@ -229,10 +230,10 @@ CudaContext::CudaContext(CudaDevice& device, bool newStream, bool standard) :
 	_ownStream = newStream;
 
 	// Allocate 4KB of page-locked memory.
-	cudaError_t error = cudaMallocHost((void**)&_pageLocked, 4096);
+	cudaMallocHost((void**)&_pageLocked, 4096);
 
 	// Allocate an auxiliary stream.
-	error = cudaStreamCreate(&_auxStream);
+	cudaStreamCreate(&_auxStream);
 }
 
 CudaContext::~CudaContext() {
@@ -433,7 +434,7 @@ cudaError_t CudaAllocBuckets::Malloc(size_t size, void** p) {
 
 	// Shrink if this allocation would put us over the limit.
 	Compact(commitSize);
-	 
+
 	cudaError_t error = cudaSuccess;
 	*p = 0;
 	if(size) error = cudaMalloc(p, allocSize);
@@ -541,7 +542,7 @@ int CudaAllocBuckets::LocateBucket(size_t size) const {
 	if(size > _maxObjectSize || size > BucketSizes[NumBuckets - 1])
 		return NumBuckets;
 
-	return (int)(std::lower_bound(BucketSizes, BucketSizes + NumBuckets, size) - 
+	return (int)(std::lower_bound(BucketSizes, BucketSizes + NumBuckets, size) -
 		BucketSizes);
 }
 

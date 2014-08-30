@@ -169,6 +169,7 @@ public:
 	cudaError_t FromHost(const std::vector<T>& data, size_t count);
 	cudaError_t FromHost(const T* data, size_t count);
 	cudaError_t FromHost(size_t destOffset, size_t bytes, const void* data);
+        T Value();
 
 private:
 	friend class CudaContext;
@@ -390,6 +391,12 @@ cudaError_t CudaDeviceMem<T>::FromHost(size_t dstOffset, size_t bytes,
 		return cudaErrorInvalidValue;
 	cudaMemcpy(_p + dstOffset, data, bytes, cudaMemcpyHostToDevice);
 	return cudaSuccess;
+}
+template<typename T>
+T CudaDeviceMem<T>::Value() {
+    T value;
+    ToHost(&value, 1);
+    return value;
 }
 template<typename T>
 CudaDeviceMem<T>::~CudaDeviceMem() {
